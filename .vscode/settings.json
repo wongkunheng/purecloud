@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "C:\\Users\\kh.wong\\Desktop\\javaRevision\\GenesysTesting\\platform\\purecloud\\target\\platform-client-v2-141.0.0.jar"
+    ]
+}
