@@ -5,32 +5,44 @@ import com.mypurecloud.sdk.v2.ApiException;
 import com.mypurecloud.sdk.v2.ApiResponse;
 import com.mypurecloud.sdk.v2.Configuration;
 import com.mypurecloud.sdk.v2.api.UsersApi;
-import com.mypurecloud.sdk.v2.model.User;
-import com.mypurecloud.sdk.v2.model.UserMe;
 import com.mypurecloud.sdk.v2.model.UserEntityListing;
 import com.mypurecloud.sdk.v2.PureCloudRegionHosts;
-import com.mypurecloud.sdk.v2.api.ConversationsApi;
-import com.mypurecloud.sdk.v2.connector.ApiClientConnectorProperty;
-import com.mypurecloud.sdk.v2.connector.okhttp.OkHttpClientConnectorProvider;
 import com.mypurecloud.sdk.v2.extensions.AuthResponse;
-import com.mypurecloud.sdk.v2.model.SendAgentlessOutboundMessageRequest;
-import com.mypurecloud.sdk.v2.model.SendAgentlessOutboundMessageResponse;
 import java.util.*;
 import org.apache.log4j.BasicConfigurator;  
 import org.apache.log4j.LogManager;  
 import org.apache.log4j.Logger;  
+import com.mypurecloud.sdk.v2.api.AnalyticsApi;
+import com.mypurecloud.sdk.v2.model.ReportingExportJobListing;
+import com.mypurecloud.sdk.v2.model.ViewFilter.MediaTypesEnum;
+import com.mypurecloud.sdk.v2.model.ReportingExportJobRequest;
+import com.mypurecloud.sdk.v2.model.ViewFilter;
+import java.io.IOException;
 
+
+
+
+import javax.xml.bind.DatatypeConverter;
+import com.mypurecloud.sdk.v2.model.SendAgentlessOutboundMessageRequest;
+import com.mypurecloud.sdk.v2.model.SendAgentlessOutboundMessageResponse;
+import com.mypurecloud.sdk.v2.model.ReportingExportJobResponse;
+import com.mypurecloud.sdk.v2.api.ConversationsApi;
+import com.mypurecloud.sdk.v2.connector.ApiClientConnectorProperty;
+import com.mypurecloud.sdk.v2.connector.okhttp.OkHttpClientConnectorProvider;
+import com.mypurecloud.sdk.v2.model.User;
+import com.mypurecloud.sdk.v2.model.UserMe;
 /**
  * Hello world!
  *
  */
 public class App 
 {
-        private static final Logger logger = LogManager.getLogger(App.class);
+    private static final Logger logger = LogManager.getLogger(App.class);
+      
 //    private static final Logger logger = Logger.getLogger(ThisClass.class.getName());
     public static void main( String[] args )
     {
-        BasicConfigurator.configure();  
+      BasicConfigurator.configure();  
  
      logger.trace("We've just greeted the user!");
      logger.debug("We've just greeted the user!");
@@ -40,9 +52,13 @@ public class App
      logger.error("We've just greeted the user!");
      logger.fatal("We've just greeted the user!");
     
-     String clientId = "5f34a9ec-17a4-49b5-9987-7ed90acf299f";
-     String clientSecret = "h5dKm5vzpS6S3I_N65HM8vxSw6F-RfXE51Oh29hXtsc";
+     String clientId = "86e507ca-b330-416a-b3c2-6073ba118a9d";
+     String clientSecret = "jrBXkrEpy4ETbhP4GYO4zcnRkGZb26s5EjHOHXC87BY";
+     String accessToken="";
+
+   
      
+//      logger.fatal(authorizationHeaderString);    
      //Start of logging to log file
      ApiClient.LoggingConfiguration loggingConfiguration = new ApiClient.LoggingConfiguration();
     loggingConfiguration.setLogLevel("trace");
@@ -51,7 +67,7 @@ public class App
     loggingConfiguration.setLogResponseBody(true);
     loggingConfiguration.setLogToConsole(true);
     loggingConfiguration.setLogFilePath("C:/Users/kh.wong/Desktop/javaRevision/GenesysTesting/javaTesting/purecloud/javasdkLog/javasdk.log");
-     //end of logging to log file
+//     end of logging to log file
      
      try
      {
@@ -63,40 +79,84 @@ public class App
      retryConfiguration.setMaxRetryTimeSec(30);
      retryConfiguration.setRetryMax(5);
 
+//      .withRetryConfiguration(retryConfiguration)
+//             .withProperty(ApiClientConnectorProperty.CONNECTOR_PROVIDER, new OkHttpClientConnectorProvider())
+//                  
      ApiClient apiClient = ApiClient.Builder.standard()
-             .withLoggingConfiguration(loggingConfiguration)
              .withBasePath(region)
-             .withRetryConfiguration(retryConfiguration)
-             .withProperty(ApiClientConnectorProperty.CONNECTOR_PROVIDER, new OkHttpClientConnectorProvider())
+//             .withLoggingConfiguration(loggingConfiguration)
+            // .withProperty(ApiClientConnectorProperty.CONNECTOR_PROVIDER, new OkHttpClientConnectorProvider())
+//             .withAccessToken(accessToken)
+//             .withShouldRefreshAccessToken(false)
              .build();
-            // .withRetryConfiguration(retryConfiguration)
-            
-     
-     ApiResponse<AuthResponse> authResponse = apiClient.authorizeClientCredentials(clientId, clientSecret);
-     String refreshToken = authResponse.getBody().getRefresh_token();
+
+            // When token expires
+
+    ApiResponse<AuthResponse> authResponse = apiClient.authorizeClientCredentials(clientId, clientSecret);
+
      // Don't actually do this, this logs your auth token to the console!
-     System.out.println("hello \n" + authResponse.getBody().toString()); 
-     int expiresIn = authResponse.getBody().getExpires_in();
-     System.out.println("Authentication successful. Access token expires in " + authResponse.getBody().getExpires_in() + " seconds");
+     accessToken=authResponse.getBody().getAccess_token();
      
+    
+
+     System.out.println("Authentication successful. Access token expires in " + authResponse.getBody().getExpires_in() + " seconds");
+
     // Use the ApiClient instance
      Configuration.setDefaultApiClient(apiClient);
-      
-
-      try {
+     
+     analyticsGetAllExportView();
+     System.out.println("Ended");
+       
+     }catch(Exception ex)
+     {
+          logger.info("System error with the authentication code" + ex);
+     }
+    }
+    private static void getUser(){
+         try {
       UsersApi apiInstance = new UsersApi();
       ArrayList list=new ArrayList();
-      String user1="986398c2-74e7-40b6-a8f6-2504de65baaf";
+      String user1="bad2eba2-6eb3-40c5-acca-36bdd22eea60";
       list.add(user1);
       UserEntityListing response = apiInstance.getUsers(null, null, list, null, null, null, null,null);
         System.out.println(response.getEntities().toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
-       
-     }catch(Exception ex)
-     {
-          logger.info(ex);
-     }
+    }
+    
+    // Get all view export requests for a user
+    private static void analyticsGetAllExportView() throws ApiException
+    {
+        
+        try
+        {
+            List<MediaTypesEnum> ListMediaType=new ArrayList();
+            ListMediaType.add(MediaTypesEnum.CHAT);
+            ViewFilter mediaTypefilter= new ViewFilter();
+            mediaTypefilter.mediaTypes(ListMediaType);
+            ReportingExportJobRequest body=new ReportingExportJobRequest();
+            body.interval("2022-03-22T00:00:00/2022-03-23T00:00:00")
+                .name("AgentPerformance Summary_2022-03-22")
+                .timeZone("UTC")
+                .period("P1D")
+                .viewType(ReportingExportJobRequest.ViewTypeEnum.AGENT_PERFORMANCE_SUMMARY_VIEW)
+                .locale("en-us")
+                .exportFormat(ReportingExportJobRequest.ExportFormatEnum.CSV)
+                .filter(mediaTypefilter)
+                .read(true)
+                .hasFormatDurations(true);
+            AnalyticsApi apiInstance= new AnalyticsApi();
+     //  apiInstance.postAnalyticsReportingExports(body);
+//       ReportingExportJobResponse response = apiInstance.postAnalyticsReportingExports(body); 
+            ReportingExportJobListing response = apiInstance.getAnalyticsReportingExports(1,25);
+//        ApiResponse<ReportingExportJobListing> response = apiInstance.getAnalyticsReportingExportsWithHttpInfo(1,25);
+            System.out.println(response.getEntities()) ;
+        }catch(IOException ex)
+        {
+            System.out.println(ex.toString());
+        }
+      
+        
     }
 }

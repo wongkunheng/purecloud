@@ -2929,7 +2929,7 @@ public class AnalyticsApi {
     }
   }
 
-  
+ 
   /**
    * Place a scheduled report immediately into the reporting queue
    * 
@@ -3035,7 +3035,7 @@ public class AnalyticsApi {
   private PostAnalyticsReportingSchedulesRequest createPostAnalyticsReportingSchedulesRequest(ReportSchedule body) {
     return PostAnalyticsReportingSchedulesRequest.builder()
             .withBody(body)
-    
+            
             .build();
   }
 
